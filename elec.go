@@ -47,23 +47,28 @@ func terminate(code int) {
 
 func launchElectron() error {
 	// Get current path
-	folderPath, err := osext.ExecutableFolder()
-	if err != nil {
-		pp.Println(err)
-		return err
-	}
+    var folderPath string
+    var err error
 
-	cond := "build" // go run の時は 'run' に変える（ダサ...）
-	var elec, elecarg string
-	if cond == "run" {
-		// launch directory
-		elec = "electron"
-		elecarg = "./Electron"
-	} else {
-		// launch binary
-		elec = folderPath + "/Electron"
-		elecarg = ""
-	}
+    cond := "run" // go build の時は何か適当なのに変える（ダサ...）
+    var elec, elecarg string
+    if cond == "run" {
+        // launch directory
+        folderPath, err = os.Getwd()
+        if err != nil {
+            return err
+        }
+        elec = "electron"
+        elecarg = "./Electron"
+    } else {
+                // launch binary
+        folderPath, err = osext.ExecutableFolder()
+        if err != nil {
+            return err
+        }
+        elec = folderPath + "/Electron"
+        elecarg = ""
+    }
 
 	out, err := pipeline.Output(
 		[]string{elec, elecarg},
